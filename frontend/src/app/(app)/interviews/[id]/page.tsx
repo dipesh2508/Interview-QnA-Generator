@@ -12,6 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { toast } from "sonner";
 import { ArrowLeft, Download, Play, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { CodeBlock } from "@/components/shared/CodeBlock";
 
 interface Question {
   _id: string;
@@ -298,9 +299,7 @@ export default function InterviewDetailPage() {
                             <div className="space-y-4 bg-muted/50 p-4 rounded-lg">
                               <div>
                                 <h4 className="font-semibold mb-2">Model Answer:</h4>
-                                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                                  {question.modelAnswer}
-                                </p>
+                                <CodeBlock content={question.modelAnswer} />
                               </div>
 
                               {question.complexityAnalysis && (

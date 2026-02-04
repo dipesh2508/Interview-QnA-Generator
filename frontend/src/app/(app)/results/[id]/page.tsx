@@ -12,7 +12,8 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
-import { ArrowLeft, Download, TrendingUp, TrendingDown, CheckCircle, XCircle, Award } from "lucide-react";
+import { ArrowLeft, Download, TrendingUp, TrendingDown, CheckCircle, XCircle, Award, Copy, Check, Code } from "lucide-react";
+import { CodeBlock } from "@/components/shared/CodeBlock";
 
 interface Evaluation {
   correctnessScore: number;
@@ -173,7 +174,7 @@ export default function ResultsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted">
+      <div className="min-h-screen bg-linear-to-br from-background to-muted">
         <div className="container mx-auto px-4 py-8 max-w-5xl">
           <Link href="/dashboard">
             <Button variant="ghost" size="sm" className="mb-6">
@@ -422,7 +423,7 @@ export default function ResultsPage() {
                               <div>
                                 <h4 className="font-semibold mb-2">Model Answer:</h4>
                                 <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-                                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{question.modelAnswer}</p>
+                                  <CodeBlock content={question.modelAnswer} />
                                 </div>
                               </div>
                             </>
