@@ -2,7 +2,6 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import apiRouter from "@/api.router";
-import { errorHandler } from "@/middleware/errorHandler.middleware";
 
 const app = express();
 
@@ -40,6 +39,11 @@ app.use((req, res) => {
 });
 
 // Global error handling middleware
-app.use(errorHandler);
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error("Error:", err);
+  res.status(err.status || 500).json({
+    error: err.message || "Internal server error",
+  });
+});
 
 export default app;

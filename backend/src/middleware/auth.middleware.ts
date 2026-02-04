@@ -72,6 +72,9 @@ export const validateUserAccess = async (
   }
 };
 
+// Alias for verifyAuthMiddleware used in routes
+export const verifyAuthMiddleware = validateUserAccess;
+
 export const validateAdminAccess = async (
   req: any,
   res: Response,
