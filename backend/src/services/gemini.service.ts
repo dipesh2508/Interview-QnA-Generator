@@ -123,30 +123,73 @@ class GeminiService {
           }
         }
 
+        // Validate and normalize required fields
+        let normalizedQuestionData = questionData;
+
+        // Handle nested interview_questions array structure
+        if (questionData.interview_questions && Array.isArray(questionData.interview_questions) && questionData.interview_questions.length > 0) {
+          const q = questionData.interview_questions[0]; // Take the first question
+          normalizedQuestionData = {
+            text: q.question_text || q.title || '',
+            modelAnswer: q.solution || q.modelAnswer || q.example?.explanation || `This is a ${q.difficulty || difficulty} level question about ${topic}. Please provide a detailed solution.`,
+            timeLimit: q.timeLimit || this.getDefaultTimeLimit(difficulty),
+            complexityAnalysis: q.complexityAnalysis || {
+              time: q.algorithmic_paradigm ? `O(?) - Depends on ${q.algorithmic_paradigm} approach` : "O(n) - Linear time complexity",
+              space: "O(1) - Constant space complexity"
+            },
+            hints: q.hints || [`Think about ${category} concepts`, `Consider edge cases`, `Optimize for time/space`],
+            conceptsTested: q.tags || q.topic ? [q.topic] : [topic],
+            commonMistakes: [`Not handling edge cases`, `Inefficient solution`],
+            interviewerExpectations: [`Clear explanation`, `Optimal solution`, `Code correctness`],
+            followUpQuestions: q.follow_up_questions?.map((fq: any) => fq.question || fq) || [`What are the edge cases?`, `Can you optimize this further?`],
+            ...questionData // Keep any other fields from the root
+          };
+        }
+        // Handle nested question structure
+        else if (questionData.question && typeof questionData.question === 'object') {
+          const q = questionData.question;
+          normalizedQuestionData = {
+            text: q.title ? `${q.title}\n\n${q.description || ''}`.trim() : q.description || '',
+            modelAnswer: q.solution || q.example?.explanation || `This is a ${q.difficulty || difficulty} level question about ${topic}. Please provide a detailed solution.`,
+            timeLimit: q.timeLimit || this.getDefaultTimeLimit(difficulty),
+            complexityAnalysis: q.complexityAnalysis || {
+              time: q.algorithmic_paradigm ? `O(?) - Depends on ${q.algorithmic_paradigm} approach` : "O(n) - Linear time complexity",
+              space: "O(1) - Constant space complexity"
+            },
+            hints: q.solution_hints || [`Think about ${category} concepts`, `Consider edge cases`, `Optimize for time/space`],
+            conceptsTested: q.tags || [topic],
+            commonMistakes: [`Not handling edge cases`, `Inefficient solution`],
+            interviewerExpectations: [`Clear explanation`, `Optimal solution`, `Code correctness`],
+            followUpQuestions: q.follow_up_questions?.map((fq: any) => fq.question || fq) || [`What are the edge cases?`, `Can you optimize this further?`],
+            ...questionData // Keep any other fields from the root
+          };
+        }
+
         // Validate required fields
-        if (!questionData.text || !questionData.modelAnswer) {
+        if (!normalizedQuestionData.text || !normalizedQuestionData.modelAnswer) {
           console.error("Missing required fields in questionData:", questionData);
+          console.error("Normalized questionData:", normalizedQuestionData);
           throw new Error("AI response missing required fields: text or modelAnswer");
         }
 
         // Create Question document
         const question = new Question({
-          text: questionData.text || `Question about ${topic} in ${category}`,
+          text: normalizedQuestionData.text || `Question about ${topic} in ${category}`,
           category,
           difficulty,
           language,
-          modelAnswer: questionData.modelAnswer || `This is a sample model answer for the ${category} question about ${topic}. Please provide a detailed solution.`,
-          timeLimit: questionData.timeLimit || this.getDefaultTimeLimit(difficulty),
-          timeLimitSeconds: (questionData.timeLimit || this.getDefaultTimeLimit(difficulty)) * 60,
-          complexityAnalysis: questionData.complexityAnalysis || {
+          modelAnswer: normalizedQuestionData.modelAnswer || `This is a sample model answer for the ${category} question about ${topic}. Please provide a detailed solution.`,
+          timeLimit: normalizedQuestionData.timeLimit || this.getDefaultTimeLimit(difficulty),
+          timeLimitSeconds: (normalizedQuestionData.timeLimit || this.getDefaultTimeLimit(difficulty)) * 60,
+          complexityAnalysis: normalizedQuestionData.complexityAnalysis || {
             time: "O(n) - Linear time complexity",
             space: "O(1) - Constant space complexity"
           },
-          hints: questionData.hints || [`Think about ${category} concepts`, `Consider edge cases`, `Optimize for time/space`],
-          conceptsTested: questionData.conceptsTested || [topic],
-          commonMistakes: questionData.commonMistakes || [`Not handling edge cases`, `Inefficient solution`],
-          interviewerExpectations: questionData.interviewerExpectations || [`Clear explanation`, `Optimal solution`, `Code correctness`],
-          followUpQuestions: questionData.followUpQuestions || [`What are the edge cases?`, `Can you optimize this further?`],
+          hints: normalizedQuestionData.hints || [`Think about ${category} concepts`, `Consider edge cases`, `Optimize for time/space`],
+          conceptsTested: normalizedQuestionData.conceptsTested || [topic],
+          commonMistakes: normalizedQuestionData.commonMistakes || [`Not handling edge cases`, `Inefficient solution`],
+          interviewerExpectations: normalizedQuestionData.interviewerExpectations || [`Clear explanation`, `Optimal solution`, `Code correctness`],
+          followUpQuestions: normalizedQuestionData.followUpQuestions || [`What are the edge cases?`, `Can you optimize this further?`],
         });
 
         await question.save();
