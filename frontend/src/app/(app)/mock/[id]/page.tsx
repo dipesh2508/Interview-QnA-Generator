@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { Clock, AlertTriangle, Send, Pause, Play } from "lucide-react";
+import { SiPython, SiCplusplus, SiOpenjdk, SiJavascript } from "react-icons/si";
 
 interface Question {
   id: string;
@@ -210,6 +211,36 @@ export default function MockInterviewPage() {
     return "text-green-500";
   };
 
+  const getLanguageIcon = (language: string) => {
+    switch (language) {
+      case "python":
+        return <SiPython className="h-3 w-3 text-blue-600" />;
+      case "cpp":
+        return <SiCplusplus className="h-3 w-3 text-blue-700" />;
+      case "java":
+        return <SiOpenjdk className="h-3 w-3 text-red-600" />;
+      case "javascript":
+        return <SiJavascript className="h-3 w-3 text-yellow-600" />;
+      default:
+        return <Clock className="h-3 w-3" />;
+    }
+  };
+
+  const getLanguageBadgeColor = (language: string) => {
+    switch (language) {
+      case "python":
+        return "bg-blue-500/10 text-blue-600 border-blue-500/20";
+      case "cpp":
+        return "bg-blue-600/10 text-blue-700 border-blue-600/20";
+      case "java":
+        return "bg-red-500/10 text-red-600 border-red-500/20";
+      case "javascript":
+        return "bg-yellow-500/10 text-yellow-600 border-yellow-500/20";
+      default:
+        return "bg-blue-500/10 text-blue-600 border-blue-500/20";
+    }
+  };
+
   const getLanguageDisplayName = (language: string) => {
     switch (language) {
       case "python":
@@ -285,8 +316,9 @@ export default function MockInterviewPage() {
                 <div className="flex gap-2">
                   <Badge variant="outline">{question.difficulty}</Badge>
                   {question.language && (
-                    <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20">
-                      {getLanguageDisplayName(question.language)}
+                    <Badge variant="outline" className={`${getLanguageBadgeColor(question.language)} flex items-center gap-1`}>
+                      {getLanguageIcon(question.language)}
+                      <span>{getLanguageDisplayName(question.language)}</span>
                     </Badge>
                   )}
                   <Badge variant="outline">

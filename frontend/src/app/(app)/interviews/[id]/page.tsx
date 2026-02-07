@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { ArrowLeft, Download, Play, Eye, EyeOff } from "lucide-react";
+import { SiPython, SiCplusplus, SiOpenjdk, SiJavascript } from "react-icons/si";
 import Link from "next/link";
 import { CodeBlock } from "@/components/shared/CodeBlock";
 
@@ -143,6 +144,36 @@ export default function InterviewDetailPage() {
     }
   };
 
+  const getLanguageIcon = (language: string) => {
+    switch (language) {
+      case "python":
+        return <SiPython className="h-3 w-3 text-blue-600" />;
+      case "cpp":
+        return <SiCplusplus className="h-3 w-3 text-blue-700" />;
+      case "java":
+        return <SiOpenjdk className="h-3 w-3 text-red-600" />;
+      case "javascript":
+        return <SiJavascript className="h-3 w-3 text-yellow-600" />;
+      default:
+        return <Eye className="h-3 w-3" />;
+    }
+  };
+
+  const getLanguageBadgeColor = (language: string) => {
+    switch (language) {
+      case "python":
+        return "bg-blue-500/10 text-blue-600 border-blue-500/20";
+      case "cpp":
+        return "bg-blue-600/10 text-blue-700 border-blue-600/20";
+      case "java":
+        return "bg-red-500/10 text-red-600 border-red-500/20";
+      case "javascript":
+        return "bg-yellow-500/10 text-yellow-600 border-yellow-500/20";
+      default:
+        return "bg-blue-500/10 text-blue-600 border-blue-500/20";
+    }
+  };
+
   const getLanguageDisplayName = (language: string) => {
     switch (language) {
       case "python":
@@ -189,7 +220,7 @@ export default function InterviewDetailPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted">
+      <div className="min-h-screen bg-linear-to-br from-background to-muted">
         <div className="container mx-auto px-4 py-8 max-w-5xl">
           <Link href="/dashboard">
             <Button variant="ghost" size="sm" className="mb-6">
@@ -210,8 +241,9 @@ export default function InterviewDetailPage() {
                       {interview.difficulty}
                     </Badge>
                     {interview.language && (
-                      <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
-                        {getLanguageDisplayName(interview.language)}
+                      <Badge variant="outline" className={`${getLanguageBadgeColor(interview.language)} flex items-center gap-1`}>
+                        {getLanguageIcon(interview.language)}
+                        <span>{getLanguageDisplayName(interview.language)}</span>
                       </Badge>
                     )}
                     <Badge variant="outline">{interview.questionCount} Questions</Badge>
