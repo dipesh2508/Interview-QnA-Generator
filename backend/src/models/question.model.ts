@@ -4,6 +4,7 @@ export interface IQuestion extends Document {
   text: string;
   category: "data-structures" | "algorithms" | "system-design" | "behavioral" | "coding";
   difficulty: "easy" | "medium" | "hard";
+  language?: "python" | "cpp" | "java" | "javascript";
   modelAnswer: string;
   timeLimit: number; // in minutes
   timeLimitSeconds: number; // in seconds
@@ -36,6 +37,11 @@ const QuestionSchema: Schema = new Schema(
       type: String,
       enum: ["easy", "medium", "hard"],
       required: [true, "Difficulty level is required"],
+    },
+    language: {
+      type: String,
+      enum: ["python", "cpp", "java", "javascript"],
+      default: "python",
     },
     modelAnswer: {
       type: String,

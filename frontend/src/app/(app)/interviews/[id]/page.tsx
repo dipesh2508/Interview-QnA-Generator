@@ -19,6 +19,7 @@ interface Question {
   text: string;
   category: string;
   difficulty: string;
+  language?: string;
   modelAnswer: string;
   timeLimit: number;
   complexityAnalysis?: {
@@ -33,6 +34,7 @@ interface Interview {
   _id: string;
   topic: string;
   difficulty: string;
+  language?: string;
   questionCount: number;
   questions: Question[];
   status: string;
@@ -141,6 +143,21 @@ export default function InterviewDetailPage() {
     }
   };
 
+  const getLanguageDisplayName = (language: string) => {
+    switch (language) {
+      case "python":
+        return "Python";
+      case "cpp":
+        return "C++";
+      case "java":
+        return "Java";
+      case "javascript":
+        return "JavaScript";
+      default:
+        return "Python";
+    }
+  };
+
   if (loading) {
     return (
       <ProtectedRoute>
@@ -192,6 +209,11 @@ export default function InterviewDetailPage() {
                     <Badge variant="outline" className={getDifficultyColor(interview.difficulty)}>
                       {interview.difficulty}
                     </Badge>
+                    {interview.language && (
+                      <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+                        {getLanguageDisplayName(interview.language)}
+                      </Badge>
+                    )}
                     <Badge variant="outline">{interview.questionCount} Questions</Badge>
                     <Badge variant="outline">{interview.status}</Badge>
                   </div>

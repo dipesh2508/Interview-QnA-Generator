@@ -230,7 +230,7 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   {recentInterviews.map((interview) => (
                     <Link key={interview._id} href={`/interviews/${interview._id}`}>
                       <div className="flex items-center justify-between p-4 border rounded-lg hover:border-primary transition-colors cursor-pointer">

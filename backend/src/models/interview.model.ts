@@ -21,6 +21,7 @@ export interface IInterview extends Document {
   userId: Types.ObjectId;
   topic: string;
   difficulty: "easy" | "medium" | "hard" | "mixed";
+  language: "python" | "cpp" | "java" | "javascript";
   questionCount: number;
   questions: Types.ObjectId[];
   responses: IInterviewResponse[];
@@ -108,6 +109,12 @@ const InterviewSchema: Schema = new Schema(
       type: String,
       enum: ["easy", "medium", "hard", "mixed"],
       required: [true, "Difficulty level is required"],
+    },
+    language: {
+      type: String,
+      enum: ["python", "cpp", "java", "javascript"],
+      default: "python",
+      required: [true, "Programming language is required"],
     },
     questionCount: {
       type: Number,

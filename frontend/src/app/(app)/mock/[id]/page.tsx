@@ -18,6 +18,7 @@ interface Question {
   text: string;
   category: string;
   difficulty: string;
+  language?: string;
   timeLimit: number;
   timeLimitSeconds: number;
   hints?: string[];
@@ -209,6 +210,21 @@ export default function MockInterviewPage() {
     return "text-green-500";
   };
 
+  const getLanguageDisplayName = (language: string) => {
+    switch (language) {
+      case "python":
+        return "Python";
+      case "cpp":
+        return "C++";
+      case "java":
+        return "Java";
+      case "javascript":
+        return "JavaScript";
+      default:
+        return "Python";
+    }
+  };
+
   if (!session || !question) {
     return (
       <ProtectedRoute>
@@ -268,6 +284,11 @@ export default function MockInterviewPage() {
                 </Badge>
                 <div className="flex gap-2">
                   <Badge variant="outline">{question.difficulty}</Badge>
+                  {question.language && (
+                    <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20">
+                      {getLanguageDisplayName(question.language)}
+                    </Badge>
+                  )}
                   <Badge variant="outline">
                     <Clock className="h-3 w-3 mr-1" />
                     {question.timeLimit} min

@@ -49974,6 +49974,12 @@ var InterviewSchema = new mongoose4.Schema(
       enum: ["easy", "medium", "hard", "mixed"],
       required: [true, "Difficulty level is required"]
     },
+    language: {
+      type: String,
+      enum: ["python", "cpp", "java", "javascript"],
+      default: "python",
+      required: [true, "Programming language is required"]
+    },
     questionCount: {
       type: Number,
       required: [true, "Question count is required"],
@@ -50052,6 +50058,11 @@ var QuestionSchema = new mongoose4.Schema(
       enum: ["easy", "medium", "hard"],
       required: [true, "Difficulty level is required"]
     },
+    language: {
+      type: String,
+      enum: ["python", "cpp", "java", "javascript"],
+      default: "python"
+    },
     modelAnswer: {
       type: String,
       required: [true, "Model answer is required"]
@@ -50127,7 +50138,7 @@ Topic: {topic}
 Return a JSON object with:
 {
   "text": "The question text with clear problem statement and examples",
-  "modelAnswer": "Concise step-by-step solution with Python code (keep under 200 words)",
+  "modelAnswer": "Concise step-by-step solution with {language} code (keep under 200 words)",
   "timeLimit": 20,
   "complexityAnalysis": {
     "time": "O(n) explanation",
@@ -50150,7 +50161,7 @@ Topic: {topic}
 Return a JSON object with:
 {
   "text": "The question text with clear problem statement and examples",
-  "modelAnswer": "Concise step-by-step solution with Python code, explaining the optimal approach (keep under 300 words)",
+  "modelAnswer": "Concise step-by-step solution with {language} code, explaining the optimal approach (keep under 300 words)",
   "timeLimit": 30,
   "complexityAnalysis": {
     "time": "O(n log n) or similar with explanation",
@@ -50173,7 +50184,7 @@ Topic: {topic}
 Return a JSON object with:
 {
   "text": "The question text with clear problem statement and examples",
-  "modelAnswer": "Concise step-by-step solution with Python code, explaining why the optimal approach is chosen (keep under 400 words)",
+  "modelAnswer": "Concise step-by-step solution with {language} code, explaining why the optimal approach is chosen (keep under 400 words)",
   "timeLimit": 40,
   "complexityAnalysis": {
     "time": "Optimal complexity with detailed explanation",
@@ -50409,7 +50420,7 @@ var GeminiService = class {
    * Generate interview questions using Gemini AI
    */
   async generateQuestions(params) {
-    const { category, difficulty, topic, count = 1 } = params;
+    const { category, difficulty, topic, count = 1, language = "python" } = params;
     const template = CATEGORY_TEMPLATES[category]?.[difficulty];
     if (!template) {
       throw new Error(`No template found for category: ${category}, difficulty: ${difficulty}`);
@@ -50419,7 +50430,7 @@ var GeminiService = class {
       try {
         const prompt = `${SYSTEM_PROMPTS.QUESTION_GENERATOR}
 
-${template.replace("{topic}", topic)}
+${template.replace("{topic}", topic).replace("{language}", this.getLanguageDisplayName(language))}
 
 IMPORTANT: Respond ONLY with a valid JSON object. Do not include any markdown formatting, explanations, or additional text. The response must be parseable JSON.`;
         const result = await model2.generateContent({
@@ -50473,6 +50484,7 @@ IMPORTANT: Respond ONLY with a valid JSON object. Do not include any markdown fo
           text: questionData.text || `Question about ${topic} in ${category}`,
           category,
           difficulty,
+          language,
           modelAnswer: questionData.modelAnswer || `This is a sample model answer for the ${category} question about ${topic}. Please provide a detailed solution.`,
           timeLimit: questionData.timeLimit || this.getDefaultTimeLimit(difficulty),
           timeLimitSeconds: (questionData.timeLimit || this.getDefaultTimeLimit(difficulty)) * 60,
@@ -50634,6 +50646,18 @@ ${prompt}`;
     return limits[difficulty];
   }
   /**
+   * Get display name for programming language
+   */
+  getLanguageDisplayName(language) {
+    const languageMap = {
+      python: "Python",
+      cpp: "C++",
+      java: "Java",
+      javascript: "JavaScript"
+    };
+    return languageMap[language] || "Python";
+  }
+  /**
    * Check if API key is configured
    */
   isConfigured() {
@@ -50649,7 +50673,7 @@ var generateInterview = async (req, res, next) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const { topic, difficulty, questionCount, categories } = req.body;
+    const { topic, difficulty, questionCount, categories, language } = req.body;
     if (!topic || !difficulty || !questionCount) {
       return res.status(400).json({ message: "Topic, difficulty, and question count are required" });
     }
@@ -50659,6 +50683,9 @@ var generateInterview = async (req, res, next) => {
     if (!["easy", "medium", "hard", "mixed"].includes(difficulty)) {
       return res.status(400).json({ message: "Invalid difficulty level" });
     }
+    if (!["python", "cpp", "java", "javascript"].includes(language || "python")) {
+      return res.status(400).json({ message: "Invalid programming language" });
+    }
     if (!gemini_service_default.isConfigured()) {
       return res.status(500).json({ message: "AI service is not configured. Please contact administrator." });
     }
@@ -50666,6 +50693,7 @@ var generateInterview = async (req, res, next) => {
       userId,
       topic,
       difficulty,
+      language: language || "python",
       questionCount,
       questions: [],
       responses: [],
@@ -50687,6 +50715,7 @@ var generateInterview = async (req, res, next) => {
         const existingQuestions = await question_model_default.find({
           category,
           difficulty: questionDifficulty,
+          language: language || "python",
           conceptsTested: { $in: [topic] }
         }).limit(count).lean();
         if (existingQuestions.length >= count) {
@@ -50697,7 +50726,8 @@ var generateInterview = async (req, res, next) => {
             category,
             difficulty: questionDifficulty,
             topic,
-            count: needed
+            count: needed,
+            language: language || "python"
           });
           questions.push(...existingQuestions, ...generatedQuestions);
         }
@@ -51033,13 +51063,6 @@ var generateInterviewPDF = (options) => {
     }
     doc.strokeColor("#CCCCCC").lineWidth(0.5).moveTo(50, doc.y).lineTo(545, doc.y).stroke().moveDown();
   });
-  const pages = doc.bufferedPageRange();
-  for (let i = 0; i < pages.count; i++) {
-    doc.switchToPage(i);
-    doc.fontSize(8).fillColor("#666666").text(`Page ${i + 1} of ${pages.count}`, 50, 750, {
-      align: "center"
-    });
-  }
   return doc;
 };
 var pdfToBuffer = (doc) => {
@@ -51587,7 +51610,7 @@ var submitMockAnswer = async (req, res, next) => {
         sessionCompleted: true,
         session: {
           id: session._id,
-          interviewId: session.interviewId.toString(),
+          interviewId: session.interviewId,
           totalQuestions: session.totalQuestions,
           totalTimeElapsed: session.totalTimeElapsed
         }

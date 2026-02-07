@@ -15,7 +15,7 @@ export const generateInterview = async (req: Request, res: Response, next: NextF
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { topic, difficulty, questionCount, categories } = req.body;
+    const { topic, difficulty, questionCount, categories, language } = req.body;
 
     // Validate input
     if (!topic || !difficulty || !questionCount) {
@@ -30,6 +30,10 @@ export const generateInterview = async (req: Request, res: Response, next: NextF
       return res.status(400).json({ message: "Invalid difficulty level" });
     }
 
+    if (!["python", "cpp", "java", "javascript"].includes(language || "python")) {
+      return res.status(400).json({ message: "Invalid programming language" });
+    }
+
     // Check if Gemini API is configured
     if (!geminiService.isConfigured()) {
       return res.status(500).json({ message: "AI service is not configured. Please contact administrator." });
@@ -40,6 +44,7 @@ export const generateInterview = async (req: Request, res: Response, next: NextF
       userId,
       topic,
       difficulty,
+      language: language || "python",
       questionCount,
       questions: [],
       responses: [],
@@ -69,6 +74,7 @@ export const generateInterview = async (req: Request, res: Response, next: NextF
         const existingQuestions = await Question.find({
           category,
           difficulty: questionDifficulty,
+          language: language || "python",
           conceptsTested: { $in: [topic] },
         })
           .limit(count)
@@ -85,6 +91,7 @@ export const generateInterview = async (req: Request, res: Response, next: NextF
             difficulty: questionDifficulty as "easy" | "medium" | "hard",
             topic,
             count: needed,
+            language: language || "python",
           });
 
           questions.push(...existingQuestions, ...generatedQuestions);

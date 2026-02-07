@@ -17,6 +17,7 @@ export interface Interview {
   _id: string;
   topic: string;
   difficulty: string;
+  language?: string;
   questionCount: number;
   status: "pending" | "in-progress" | "completed" | "abandoned";
   overallScore?: number;
@@ -126,6 +127,7 @@ class ApiClient {
   async generateInterview(data: {
     topic: string;
     difficulty: "easy" | "medium" | "hard" | "mixed";
+    language?: "python" | "cpp" | "java" | "javascript";
     questionCount: number;
     categories?: string[];
   }) {

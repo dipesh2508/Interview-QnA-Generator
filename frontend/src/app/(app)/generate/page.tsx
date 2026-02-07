@@ -30,6 +30,7 @@ export default function GeneratePage() {
   const [formData, setFormData] = useState({
     topic: "",
     difficulty: "medium" as "easy" | "medium" | "hard" | "mixed",
+    language: "python" as "python" | "cpp" | "java" | "javascript",
     questionCount: 5,
     categories: ["data-structures", "algorithms", "coding"],
   });
@@ -54,6 +55,7 @@ export default function GeneratePage() {
       const response: any = await apiClient.generateInterview({
         topic: formData.topic,
         difficulty: formData.difficulty,
+        language: formData.language,
         questionCount: formData.questionCount,
         categories: formData.categories,
       });
@@ -140,6 +142,27 @@ export default function GeneratePage() {
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground">Choose the difficulty level or mix of difficulties</p>
+                </div>
+
+                {/* Language */}
+                <div className="space-y-2">
+                  <Label htmlFor="language">Programming Language</Label>
+                  <Select
+                    value={formData.language}
+                    onValueChange={(value: any) => setFormData((prev) => ({ ...prev, language: value }))}
+                    disabled={loading}
+                  >
+                    <SelectTrigger id="language">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="python">Python</SelectItem>
+                      <SelectItem value="cpp">C++</SelectItem>
+                      <SelectItem value="java">Java</SelectItem>
+                      <SelectItem value="javascript">JavaScript</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Choose the programming language for coding questions</p>
                 </div>
 
                 {/* Question Count */}

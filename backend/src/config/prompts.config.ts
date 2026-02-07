@@ -36,7 +36,7 @@ Topic: {topic}
 Return a JSON object with:
 {
   "text": "The question text with clear problem statement and examples",
-  "modelAnswer": "Concise step-by-step solution with Python code (keep under 200 words)",
+  "modelAnswer": "Concise step-by-step solution with {language} code (keep under 200 words)",
   "timeLimit": 20,
   "complexityAnalysis": {
     "time": "O(n) explanation",
@@ -60,7 +60,7 @@ Topic: {topic}
 Return a JSON object with:
 {
   "text": "The question text with clear problem statement and examples",
-  "modelAnswer": "Concise step-by-step solution with Python code, explaining the optimal approach (keep under 300 words)",
+  "modelAnswer": "Concise step-by-step solution with {language} code, explaining the optimal approach (keep under 300 words)",
   "timeLimit": 30,
   "complexityAnalysis": {
     "time": "O(n log n) or similar with explanation",
@@ -84,7 +84,7 @@ Topic: {topic}
 Return a JSON object with:
 {
   "text": "The question text with clear problem statement and examples",
-  "modelAnswer": "Concise step-by-step solution with Python code, explaining why the optimal approach is chosen (keep under 400 words)",
+  "modelAnswer": "Concise step-by-step solution with {language} code, explaining why the optimal approach is chosen (keep under 400 words)",
   "timeLimit": 40,
   "complexityAnalysis": {
     "time": "Optimal complexity with detailed explanation",

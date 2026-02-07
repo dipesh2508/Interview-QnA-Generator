@@ -28,6 +28,7 @@ export interface QuestionGenerationParams {
   difficulty: "easy" | "medium" | "hard";
   topic: string;
   count?: number;
+  language?: "python" | "cpp" | "java" | "javascript";
 }
 
 export interface EvaluationParams {
@@ -54,7 +55,7 @@ class GeminiService {
    * Generate interview questions using Gemini AI
    */
   async generateQuestions(params: QuestionGenerationParams): Promise<IQuestion[]> {
-    const { category, difficulty, topic, count = 1 } = params;
+    const { category, difficulty, topic, count = 1, language = "python" } = params;
 
     // Get the appropriate template
     const template = CATEGORY_TEMPLATES[category]?.[difficulty];
@@ -67,7 +68,7 @@ class GeminiService {
     // Generate each question
     for (let i = 0; i < count; i++) {
       try {
-        const prompt = `${SYSTEM_PROMPTS.QUESTION_GENERATOR}\n\n${template.replace("{topic}", topic)}\n\nIMPORTANT: Respond ONLY with a valid JSON object. Do not include any markdown formatting, explanations, or additional text. The response must be parseable JSON.`;
+        const prompt = `${SYSTEM_PROMPTS.QUESTION_GENERATOR}\n\n${template.replace("{topic}", topic).replace("{language}", this.getLanguageDisplayName(language))}\n\nIMPORTANT: Respond ONLY with a valid JSON object. Do not include any markdown formatting, explanations, or additional text. The response must be parseable JSON.`;
 
         const result = await model.generateContent({
           contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -133,6 +134,7 @@ class GeminiService {
           text: questionData.text || `Question about ${topic} in ${category}`,
           category,
           difficulty,
+          language,
           modelAnswer: questionData.modelAnswer || `This is a sample model answer for the ${category} question about ${topic}. Please provide a detailed solution.`,
           timeLimit: questionData.timeLimit || this.getDefaultTimeLimit(difficulty),
           timeLimitSeconds: (questionData.timeLimit || this.getDefaultTimeLimit(difficulty)) * 60,
@@ -323,6 +325,19 @@ class GeminiService {
       hard: 40,
     };
     return limits[difficulty];
+  }
+
+  /**
+   * Get display name for programming language
+   */
+  private getLanguageDisplayName(language: string): string {
+    const languageMap: { [key: string]: string } = {
+      python: "Python",
+      cpp: "C++",
+      java: "Java",
+      javascript: "JavaScript",
+    };
+    return languageMap[language] || "Python";
   }
 
   /**

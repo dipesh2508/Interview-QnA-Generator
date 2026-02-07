@@ -139,6 +139,21 @@ export default function InterviewsPage() {
     });
   };
 
+  const getLanguageDisplayName = (language: string) => {
+    switch (language) {
+      case "python":
+        return "Python";
+      case "cpp":
+        return "C++";
+      case "java":
+        return "Java";
+      case "javascript":
+        return "JavaScript";
+      default:
+        return "Python";
+    }
+  };
+
   if (loading) {
     return (
       <ProtectedRoute>
@@ -261,6 +276,12 @@ export default function InterviewsPage() {
                           <BookOpen className="h-4 w-4 text-muted-foreground" />
                           <span>{interview.questionCount} questions</span>
                         </div>
+                        {interview.language && (
+                          <div className="flex items-center gap-2">
+                            <span className="h-4 w-4 text-blue-500">💻</span>
+                            <span>{getLanguageDisplayName(interview.language)}</span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Score Display */}
