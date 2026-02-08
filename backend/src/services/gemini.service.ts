@@ -128,20 +128,39 @@ class GeminiService {
 
         // Handle nested interview_questions array structure
         if (questionData.interview_questions && Array.isArray(questionData.interview_questions) && questionData.interview_questions.length > 0) {
-          const q = questionData.interview_questions[0]; // Take the first question
+          // Find the question that matches the requested category
+          let selectedQuestion = questionData.interview_questions.find((q: any) =>
+            q.category?.toLowerCase().includes(category.toLowerCase().replace('-', ' '))
+          );
+
+          // If no exact match, try to find system design related questions
+          if (!selectedQuestion && category === 'system-design') {
+            selectedQuestion = questionData.interview_questions.find((q: any) =>
+              q.category?.toLowerCase().includes('system') ||
+              q.category?.toLowerCase().includes('design') ||
+              q.question?.toLowerCase().includes('design')
+            );
+          }
+
+          // If still no match, pick the first question
+          if (!selectedQuestion) {
+            selectedQuestion = questionData.interview_questions[0];
+          }
+
+          const q = selectedQuestion;
           normalizedQuestionData = {
-            text: q.question_text || q.title || '',
-            modelAnswer: q.solution || q.modelAnswer || q.example?.explanation || `This is a ${q.difficulty || difficulty} level question about ${topic}. Please provide a detailed solution.`,
+            text: q.question_text || q.question || q.title || q.description || '',
+            modelAnswer: q.solution || q.modelAnswer || q.answer || q.example?.explanation || `This is a ${q.level || q.difficulty || difficulty} level question about ${topic}. Please provide a detailed solution.`,
             timeLimit: q.timeLimit || this.getDefaultTimeLimit(difficulty),
             complexityAnalysis: q.complexityAnalysis || {
               time: q.algorithmic_paradigm ? `O(?) - Depends on ${q.algorithmic_paradigm} approach` : "O(n) - Linear time complexity",
               space: "O(1) - Constant space complexity"
             },
-            hints: q.hints || [`Think about ${category} concepts`, `Consider edge cases`, `Optimize for time/space`],
+            hints: q.hints || q.solution_hints || [`Think about ${category} concepts`, `Consider edge cases`, `Optimize for time/space`],
             conceptsTested: q.tags || q.topic ? [q.topic] : [topic],
-            commonMistakes: [`Not handling edge cases`, `Inefficient solution`],
-            interviewerExpectations: [`Clear explanation`, `Optimal solution`, `Code correctness`],
-            followUpQuestions: q.follow_up_questions?.map((fq: any) => fq.question || fq) || [`What are the edge cases?`, `Can you optimize this further?`],
+            commonMistakes: q.commonMistakes || [`Not handling edge cases`, `Inefficient solution`],
+            interviewerExpectations: q.interviewerExpectations || [`Clear explanation`, `Optimal solution`, `Code correctness`],
+            followUpQuestions: q.follow_ups || q.follow_up_questions?.map((fq: any) => fq.question || fq) || [`What are the edge cases?`, `Can you optimize this further?`],
             ...questionData // Keep any other fields from the root
           };
         }
