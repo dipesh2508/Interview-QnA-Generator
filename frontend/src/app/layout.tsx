@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Interview Q&A Generator - Google SDE-I Prep",
-  description: "AI-powered interview preparation platform for Google SDE-I interviews",
+  title: "InterviewPrep AI",
+  description: "AI-powered interview preparation platform for developers",
 };
 
 export default function RootLayout({

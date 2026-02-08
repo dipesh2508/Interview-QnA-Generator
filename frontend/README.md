@@ -1,22 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# InterviewPrep AI
+
+AI-powered interview preparation platform for developers. Generate personalized interview questions, practice mock interviews, and track your progress with detailed analytics.
+
+## Features
+
+- **AI-Generated Questions**: Generate interview questions for multiple programming languages (Python, Java, C++, JavaScript)
+- **Mock Interviews**: Practice with timed sessions and detailed feedback
+- **Progress Tracking**: Monitor your performance and improvement over time
+- **Multiple Categories**: Coding, System Design, Behavioral, and more
+- **Customizable Difficulty**: Easy, Medium, Hard levels
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Node.js, Express, MongoDB
+- **AI**: Google Gemini for question generation
+- **Authentication**: JWT-based auth
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
+
+```bash
+npm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

@@ -216,7 +216,7 @@ export default function MockInterviewPage() {
       case "python":
         return <SiPython className="h-3 w-3 text-blue-600" />;
       case "cpp":
-        return <SiCplusplus className="h-3 w-3 text-blue-700" />;
+        return <SiCplusplus className="h-3 w-3 text-indigo-800" />;
       case "java":
         return <SiOpenjdk className="h-3 w-3 text-red-600" />;
       case "javascript":
